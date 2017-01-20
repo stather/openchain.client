@@ -67,6 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="PassphraseFactory.cs" />
     <Compile Include="Records\AccountRecord.cs" />
     <Compile Include="ApiProxy.cs" />
     <Compile Include="ApiProxyHelper.cs" />
