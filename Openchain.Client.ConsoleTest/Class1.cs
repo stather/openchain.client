@@ -10,21 +10,44 @@ namespace OpenChain.Client.ConsoleTest
         }
 
         // these are test-only secrets !
-        const string admin = "combat pélican gagner bateau caporal infini charbon neutron détester menhir causer espoir carbone saugrenu obscur inexact torrent rayonner laisser relief féroce honteux cirer époque";
+        const string admin = "remind pause film conduct protect grab young myth refuse depth liberty bean";
         // corresponding address is "XiqvPB63hh8TML2iWYGDvF7i3HXRxqv3nN" : add this address to admin list in openchain server config.json
 
-        const string alice = "pélican combat gagner bateau caporal infini charbon neutron détester menhir causer espoir carbone saugrenu obscur inexact torrent rayonner laisser relief féroce honteux cirer époque";
-        const string bob = "pélican gagner combat bateau caporal infini charbon neutron détester menhir causer espoir carbone saugrenu obscur inexact torrent rayonner laisser relief féroce honteux cirer époque";
-
+        const string alice = "hidden position purse loop neutral miss know deliver sorry wife general able";
+        const string bob = "moon later shift frame vendor aisle brush enrich guitar mix shock picture";
+        const string fred = "cover pumpkin child stool vehicle alone rescue behind mom wrong mistake help";
         public async Task Run()
         {
-            var ocs = new OpenChainServer("http://localhost:8080/");
+            var ocs = new OpenChainServer("http://localhost:5000/");
+
+
+            //try
+            //{
+            //    var m = MnemonicFactor.Create();
+            //    var ss = ocs.Login(fred);
+            //    var adacc = ocs.Login(admin);
+
+            //    var bert = await ocs.GetData<string>("/aka/fred", "goto");
+            //    if (bert.Value == null)
+            //    {
+            //        bert.Value = ss.Account;
+            //        await adacc.SetData(bert);
+            //    }
+
+            //    var gbp = "/asset/GBP";
+            //    var ti = await adacc.Transfert(gbp, ss.Account, 120, gbp);
+            //}
+            //catch (Exception e)
+            //{
+            //    Console.WriteLine(e);
+            //}
 
             string assetPath;
 
             using (var a = ocs.Login(alice))
             using (var ad = ocs.Login(admin))
             using (var b = ocs.Login(bob))
+            using (var d = ocs.Login(fred))
             {
                 var ir = await ocs.GetData<LedgerInfo>("/", "info");
                 if (ir.Value == null || ir.Value.Name != "My Ledger")
@@ -49,7 +72,15 @@ namespace OpenChain.Client.ConsoleTest
                     await ad.SetData(gt);
                 }
 
+                gt = await ad.GetData<string>("/aka/fred", "goto");
+                if (gt.Value == null)
+                {
+                    gt.Value = d.Account;
+                    await ad.SetData(gt);
+                }
+
                 assetPath = "/asset/gold/"; //ad.GetAssetPath(0);
+                var gbpPath = "/asset/GBP";
 
                 foreach (var r in await ad.GetAccountRecords())
                     Console.WriteLine($"ad : {r}");
