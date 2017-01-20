@@ -1,4 +1,8 @@
 ﻿using System;
+using System.Linq;
+using System.Net.WebSockets;
+using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace OpenChain.Client.ConsoleTest
@@ -10,45 +14,74 @@ namespace OpenChain.Client.ConsoleTest
         }
 
         // these are test-only secrets !
-        const string admin = "remind pause film conduct protect grab young myth refuse depth liberty bean";
+        const string admin = "combat pélican gagner bateau caporal infini charbon neutron détester menhir causer espoir carbone saugrenu obscur inexact torrent rayonner laisser relief féroce honteux cirer époque";
         // corresponding address is "XiqvPB63hh8TML2iWYGDvF7i3HXRxqv3nN" : add this address to admin list in openchain server config.json
 
-        const string alice = "hidden position purse loop neutral miss know deliver sorry wife general able";
-        const string bob = "moon later shift frame vendor aisle brush enrich guitar mix shock picture";
-        const string fred = "cover pumpkin child stool vehicle alone rescue behind mom wrong mistake help";
+        const string alice = "pélican combat gagner bateau caporal infini charbon neutron détester menhir causer espoir carbone saugrenu obscur inexact torrent rayonner laisser relief féroce honteux cirer époque";
+        const string bob = "pélican gagner combat bateau caporal infini charbon neutron détester menhir causer espoir carbone saugrenu obscur inexact torrent rayonner laisser relief féroce honteux cirer époque";
+
+        private const string fred = "bomb clock can ripple sister energy motion produce envelope photo skirt duck";
+
         public async Task Run()
         {
-            var ocs = new OpenChainServer("http://localhost:5000/");
+            var ocs = new OpenChainServer("http://openchain20170120104825.azurewebsites.net/");
 
 
-            //try
-            //{
-            //    var m = MnemonicFactor.Create();
-            //    var ss = ocs.Login(fred);
-            //    var adacc = ocs.Login(admin);
+            try
+            {
+                var cts = new CancellationTokenSource();
+                var socket = new ClientWebSocket();
+                //var wsUri = $"ws://openchain20170120104825.azurewebsites.net/stream";
+                var wsUri = $"ws://localhost:5000/stream";
+                await socket.ConnectAsync(new Uri(wsUri), cts.Token);
+                await Task.Factory.StartNew(
+      async () =>
+      {
+          var rcvBytes = new byte[1024];
+          var rcvBuffer = new ArraySegment<byte>(rcvBytes);
+          while (true)
+          {
+              WebSocketReceiveResult rcvResult =
+                  await socket.ReceiveAsync(rcvBuffer, cts.Token);
+              byte[] msgBytes = rcvBuffer
+                  .Skip(rcvBuffer.Offset)
+                  .Take(rcvResult.Count).ToArray();
+              try
+              {
+                  PassphraseFactory.DecodeMessage(msgBytes);
+              }
+              catch (Exception e)
+              {
+                  Console.WriteLine(e);
+                  throw;
+              }
+              string rcvMsg = Encoding.UTF8.GetString(msgBytes);
+              Console.WriteLine("Received: {0}", rcvMsg);
+          }
+      }, cts.Token, TaskCreationOptions.LongRunning,
+         TaskScheduler.Default);
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+            }
 
-            //    var bert = await ocs.GetData<string>("/aka/fred", "goto");
-            //    if (bert.Value == null)
-            //    {
-            //        bert.Value = ss.Account;
-            //        await adacc.SetData(bert);
-            //    }
-
-            //    var gbp = "/asset/GBP";
-            //    var ti = await adacc.Transfert(gbp, ss.Account, 120, gbp);
-            //}
-            //catch (Exception e)
-            //{
-            //    Console.WriteLine(e);
-            //}
-
+            await Task.Delay(TimeSpan.FromDays(1));
             string assetPath;
+            var gbpPath = "/asset/GBP/";
 
+            var george = PassphraseFactory.GetNewPassphrase();
+
+            using (var gg = ocs.Login(george))
+            using (var f = ocs.Login(fred))
             using (var a = ocs.Login(alice))
             using (var ad = ocs.Login(admin))
             using (var b = ocs.Login(bob))
-            using (var d = ocs.Login(fred))
             {
+                await ocs.GetStream();
+                var res2 = await ad.Transfert(ad.Account, gg.Account, 77, gbpPath);
+
+                var res = await f.Transfert(f.Account, a.Account, 44, gbpPath);
                 var ir = await ocs.GetData<LedgerInfo>("/", "info");
                 if (ir.Value == null || ir.Value.Name != "My Ledger")
                 {
@@ -72,20 +105,21 @@ namespace OpenChain.Client.ConsoleTest
                     await ad.SetData(gt);
                 }
 
-                gt = await ad.GetData<string>("/aka/fred", "goto");
+                gt = await ad.GetData<string>("/aka/fred/", "goto");
                 if (gt.Value == null)
                 {
-                    gt.Value = d.Account;
+                    gt.Value = f.Account;
                     await ad.SetData(gt);
                 }
 
                 assetPath = "/asset/gold/"; //ad.GetAssetPath(0);
-                var gbpPath = "/asset/GBP";
 
                 foreach (var r in await ad.GetAccountRecords())
                     Console.WriteLine($"ad : {r}");
 
                 Console.WriteLine($"Transfert : {await ad.Transfert(assetPath, ad.Account, 300, assetPath)}");
+                await ad.Transfert(gbpPath, ad.Account, 400, gbpPath);
+                await ad.Transfert(ad.Account, f.Account, 123, gbpPath);
 
                 foreach (var r in await ad.GetAccountRecords())
                     Console.WriteLine($"ad : {r}");

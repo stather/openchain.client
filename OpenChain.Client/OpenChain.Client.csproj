@@ -67,7 +67,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="MnemonicFactor.cs" />
+    <Compile Include="PassphraseFactory.cs" />
     <Compile Include="Records\AccountRecord.cs" />
     <Compile Include="ApiProxy.cs" />
     <Compile Include="ApiProxyHelper.cs" />
