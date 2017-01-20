@@ -31,8 +31,8 @@ namespace OpenChain.Client.ConsoleTest
             {
                 var cts = new CancellationTokenSource();
                 var socket = new ClientWebSocket();
-                //var wsUri = $"ws://openchain20170120104825.azurewebsites.net/stream";
-                var wsUri = $"ws://localhost:5000/stream";
+                var wsUri = $"ws://openchain20170120104825.azurewebsites.net/stream";
+                //var wsUri = $"ws://localhost:5000/stream";
                 await socket.ConnectAsync(new Uri(wsUri), cts.Token);
                 await Task.Factory.StartNew(
       async () =>
@@ -78,7 +78,6 @@ namespace OpenChain.Client.ConsoleTest
             using (var ad = ocs.Login(admin))
             using (var b = ocs.Login(bob))
             {
-                await ocs.GetStream();
                 var res2 = await ad.Transfert(ad.Account, gg.Account, 77, gbpPath);
 
                 var res = await f.Transfert(f.Account, a.Account, 44, gbpPath);
