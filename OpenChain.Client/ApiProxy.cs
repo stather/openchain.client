@@ -114,8 +114,19 @@ namespace OpenChain.Client
                 return ret.Select(x => new Record($"{x.account}:ACC:{x.asset}".ToByteString(), x.balance.ToByteString(), ByteString.Parse(x.version))).ToList();
             }
         }
+        public async Task<QueryAccountResultItem[]> GetAccountInfo(string account)
+        {
+            using (var cli = new HttpClient())
+            {
+                var query = $"{BaseUrl}query/account?account={WebUtility.UrlEncode(account)}";
+                var tresult = await cli.GetStringAsync(query);
+                var ret = JsonConvert.DeserializeObject<QueryAccountResultItem[]>(tresult);
+                return ret;
+            }
+        }
 
-        private class QueryAccountResultItem
+
+        public class QueryAccountResultItem
         {
             public string account
             {

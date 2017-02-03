@@ -27,46 +27,46 @@ namespace OpenChain.Client.ConsoleTest
             var ocs = new OpenChainServer("http://openchain20170120104825.azurewebsites.net/");
 
 
-            try
-            {
-                var cts = new CancellationTokenSource();
-                var socket = new ClientWebSocket();
-                var wsUri = $"ws://openchain20170120104825.azurewebsites.net/stream";
-                //var wsUri = $"ws://localhost:5000/stream";
-                await socket.ConnectAsync(new Uri(wsUri), cts.Token);
-                await Task.Factory.StartNew(
-      async () =>
-      {
-          var rcvBytes = new byte[1024];
-          var rcvBuffer = new ArraySegment<byte>(rcvBytes);
-          while (true)
-          {
-              WebSocketReceiveResult rcvResult =
-                  await socket.ReceiveAsync(rcvBuffer, cts.Token);
-              byte[] msgBytes = rcvBuffer
-                  .Skip(rcvBuffer.Offset)
-                  .Take(rcvResult.Count).ToArray();
-              try
-              {
-                  PassphraseFactory.DecodeMessage(msgBytes);
-              }
-              catch (Exception e)
-              {
-                  Console.WriteLine(e);
-                  throw;
-              }
-              string rcvMsg = Encoding.UTF8.GetString(msgBytes);
-              Console.WriteLine("Received: {0}", rcvMsg);
-          }
-      }, cts.Token, TaskCreationOptions.LongRunning,
-         TaskScheduler.Default);
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-            }
+      //      try
+      //      {
+      //          var cts = new CancellationTokenSource();
+      //          var socket = new ClientWebSocket();
+      //          var wsUri = $"ws://openchain20170120104825.azurewebsites.net/stream";
+      //          //var wsUri = $"ws://localhost:5000/stream";
+      //          await socket.ConnectAsync(new Uri(wsUri), cts.Token);
+      //          await Task.Factory.StartNew(
+      //async () =>
+      //{
+      //    var rcvBytes = new byte[1024];
+      //    var rcvBuffer = new ArraySegment<byte>(rcvBytes);
+      //    while (true)
+      //    {
+      //        WebSocketReceiveResult rcvResult =
+      //            await socket.ReceiveAsync(rcvBuffer, cts.Token);
+      //        byte[] msgBytes = rcvBuffer
+      //            .Skip(rcvBuffer.Offset)
+      //            .Take(rcvResult.Count).ToArray();
+      //        try
+      //        {
+      //            PassphraseFactory.DecodeMessage(msgBytes);
+      //        }
+      //        catch (Exception e)
+      //        {
+      //            Console.WriteLine(e);
+      //            throw;
+      //        }
+      //        //string rcvMsg = Encoding.UTF8.GetString(msgBytes);
+      //        //Console.WriteLine("Received: {0}", rcvMsg);
+      //    }
+      //}, cts.Token, TaskCreationOptions.LongRunning,
+      //   TaskScheduler.Default);
+      //      }
+      //      catch (Exception e)
+      //      {
+      //          Console.WriteLine(e);
+      //      }
 
-            await Task.Delay(TimeSpan.FromDays(1));
+      //      await Task.Delay(TimeSpan.FromDays(1));
             string assetPath;
             var gbpPath = "/asset/GBP/";
 

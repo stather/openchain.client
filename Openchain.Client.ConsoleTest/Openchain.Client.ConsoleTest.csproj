@@ -34,7 +34,9 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Runtime" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -51,7 +53,7 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\OpenChain.Client\OpenChain.Client.csproj">
+    <ProjectReference Include="..\..\Visual Studio 2015\Projects\MotoPay20\OpenChain.Client\OpenChain.Client.csproj">
       <Project>{8165ae78-3cb9-4264-8710-4caa5ebc94ae}</Project>
       <Name>OpenChain.Client</Name>
     </ProjectReference>
